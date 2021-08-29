@@ -1,0 +1,1 @@
+docker run --ulimit memlock=-1:-1 -it --rm=true --memory-swappiness=0 --name mnaut-demo -e POSTGRES_USER=mnaut-demo -e POSTGRES_PASSWORD=mnaut-demo -e POSTGRES_DB=mnaut-demo -p 5432:5432 postgres:11.5
