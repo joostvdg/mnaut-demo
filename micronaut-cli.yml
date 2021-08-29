@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.github.joostvdg
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [annotation-api, app-name, asciidoctor, config-kubernetes, data, data-jpa, dekorate-jaeger, dekorate-kubernetes, dekorate-prometheus, flyway, github-workflow-google-cloud-run-graalvm, github-workflow-graal-docker-registry, graalvm, hamcrest, http-client, java, java-application, jdbc-hikari, jib, junit, kubernetes, logback, management, maven, micrometer, micrometer-prometheus, netty-server, openapi, postgres, properties, readme, shade, testcontainers]
