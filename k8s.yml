@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: "mnaut-demo"
-          image: "gcr.io/mnaut-demo/jib-image"
+          image: "registry.hub.docker.com/caladreas/mnaut-demo"
           ports:
             - name: http
               containerPort: 8080

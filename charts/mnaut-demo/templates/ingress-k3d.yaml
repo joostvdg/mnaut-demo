@@ -1,0 +1,22 @@
+{{- if .Values.ingress.k3d.enabled -}}
+{{- $fullName := include "mnaut-demo.fullname" . -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+  {{- include "mnaut-demo.labels" . | nindent 4 }}
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: 80
+  {{- end }}

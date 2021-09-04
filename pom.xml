@@ -112,11 +112,11 @@
       <artifactId>micronaut-flyway</artifactId>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>io.micronaut.kubernetes</groupId>
-      <artifactId>micronaut-kubernetes-discovery-client</artifactId>
-      <scope>compile</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>io.micronaut.kubernetes</groupId>-->
+<!--      <artifactId>micronaut-kubernetes-discovery-client</artifactId>-->
+<!--      <scope>compile</scope>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>io.micronaut.micrometer</groupId>
       <artifactId>micronaut-micrometer-core</artifactId>
@@ -260,11 +260,11 @@
               <artifactId>micronaut-data-processor</artifactId>
               <version>${micronaut.data.version}</version>
             </path>
-            <path>
-              <groupId>io.micronaut.openapi</groupId>
-              <artifactId>micronaut-openapi</artifactId>
-              <version>${micronaut.openapi.version}</version>
-            </path>
+<!--            <path>-->
+<!--              <groupId>io.micronaut.openapi</groupId>-->
+<!--              <artifactId>micronaut-openapi</artifactId>-->
+<!--              <version>${micronaut.openapi.version}</version>-->
+<!--            </path>-->
           </annotationProcessorPaths>
           <compilerArgs>
             <arg>-Amicronaut.processing.group=com.github.joostvdg</arg>
