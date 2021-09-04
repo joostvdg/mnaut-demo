@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: registry.hub.docker.com/caladreas/mnaut-demo
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
@@ -80,6 +80,8 @@ affinity: {}
 
 datasource:
     url: 'jdbc:postgresql://mnaut-demo-postgresql:5432/mnaut-demo'
+
+
 
 postgresql:
   global:
