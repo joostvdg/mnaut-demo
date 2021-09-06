@@ -44,7 +44,7 @@ spec:
                                 sh 'echo image fqn=${REPO}/${IMAGE}:${TAG}'
 				
                                 container('maven') {
-				  sh "./mvnw deploy -Dpackaging=docker-native -Djib.docker.image=${REPO}/${IMAGE}:${TAG} -Djib.to.auth.username=${DHUB_USR} -Djib.to.auth.password=${DHUB_PSW} --no-transfer-progress"
+				  sh "mvn deploy -Dpackaging=docker-native -Djib.docker.image=${REPO}/${IMAGE}:${TAG} -Djib.to.auth.username=${DHUB_USR} -Djib.to.auth.password=${DHUB_PSW} --no-transfer-progress"
 				}
                             }
                         }
