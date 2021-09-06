@@ -45,6 +45,9 @@ jobs:
           echo ${{ steps.extract.outputs.artifact-id }}
           echo ${{ steps.extract.outputs.version }}
         shell: bash          
+      - name: Bump Version
+        run: mvn versions:set -DnewVersion=0.1."${PR_SHA}"
+        shell: bash        
       - name: Build And Push Docker Image
         env:
           DOCKER_REPOSITORY_PATH: ${{ secrets.DOCKER_REPOSITORY_PATH }}
