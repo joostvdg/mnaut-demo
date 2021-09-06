@@ -4,7 +4,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Get HEAD SHA
+        run: echo "PR_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+      - name: Verify HEAD SHA
+        run: echo "PR_SHA=${PR_SHA}"
+      - name: Test2
+        run: echo $PR_SHA
+      - name: Set env
+        run: echo "GITHUB_SHA_SHORT=$(echo $PR_SHA | cut -c 1-6)" >> $GITHUB_ENV
+      - name: Test
+        run: echo $GITHUB_SHA_SHORT        
       - uses: actions/cache@v2
         with:
           path: |
@@ -29,5 +42,5 @@ jobs:
           DOCKER_REGISTRY_URL: ${{ secrets.DOCKER_REGISTRY_URL }}
           TESTCONTAINERS_RYUK_DISABLED: true
         run: |
-          export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/mnaut-demo" | sed -e 's#//#/#' -e 's#^/##'`
+          export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/mnaut-demo:${PR_SHA}" | sed -e 's#//#/#' -e 's#^/##'`
           ./mvnw deploy -Dpackaging=docker-native -Djib.docker.image=$DOCKER_IMAGE --no-transfer-progress
