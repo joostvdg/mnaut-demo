@@ -19,7 +19,7 @@ kind: Pod
 spec:
   containers:
   - name: maven
-    image: caladreas/jx-builder-graalvm-maven-jdk11:v0.14.0
+    image: softinstigate/graalvm:21.1.0.r16-grl //caladreas/jx-builder-graalvm-maven-jdk11:v0.14.0
     command:
     - cat
     tty: true
