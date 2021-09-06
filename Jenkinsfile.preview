@@ -18,32 +18,11 @@ pipeline {
 kind: Pod
 spec:
   containers:
-  - name: golang
-    image: golang:1.16
+  - name: maven
+    image: maven:3.8.2-jdk-11
     command:
     - cat
     tty: true
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:debug
-    imagePullPolicy: Always
-    command:
-    - /busybox/cat
-    tty: true
-    volumeMounts:
-      - name: jenkins-docker-cfg
-        mountPath: /kaniko/.docker
-    env:
-      - name: DOCKER_CONFIG
-        value: /kaniko/.docker
-  volumes:
-  - name: jenkins-docker-cfg
-    projected:
-      sources:
-      - secret:
-          name: docker-credentials
-          items:
-            - key: .dockerconfigjson
-              path: config.json
 """
                         }
                     }
@@ -55,19 +34,16 @@ spec:
                                 }
                             }
                         }
-                        stage('Build with Kaniko') {
+                        stage('Build with Maven & Jib') {
                             environment {
                                 TAG = "${GIT_SHA}"
                             }
                             steps {
                                 sh 'echo image fqn=${REPO}/${IMAGE}:${TAG}'
-                                container(name: 'kaniko', shell: '/busybox/sh') {
-                                    withEnv(['PATH+EXTRA=/busybox']) {
-                                        sh '''#!/busybox/sh
-                                        /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cleanup --cache=true --destination ${REPO}/${IMAGE}:${TAG} --destination ${REPO}/${IMAGE}:latest
-                                        '''
-                                    }
-                                }
+				
+                                container('maven') {
+				  sh "./mvnw deploy -Dpackaging=docker-native -Djib.docker.image=${REPO}/${IMAGE}:${TAG} --no-transfer-progress"
+				}
                             }
                         }
                     }
