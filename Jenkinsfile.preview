@@ -19,7 +19,7 @@ kind: Pod
 spec:
   containers:
   - name: maven
-    image: maven:3.8.2-jdk-11
+    image: caladreas/jx-builder-graalvm-maven-jdk11:v0.9.0
     command:
     - cat
     tty: true
@@ -37,12 +37,14 @@ spec:
                         stage('Build with Maven & Jib') {
                             environment {
                                 TAG = "${GIT_SHA}"
+                                TESTCONTAINERS_RYUK_DISABLED= true
+                                DHUB = credentials('dockerhub-token')
                             }
                             steps {
                                 sh 'echo image fqn=${REPO}/${IMAGE}:${TAG}'
 				
                                 container('maven') {
-				  sh "./mvnw deploy -Dpackaging=docker-native -Djib.docker.image=${REPO}/${IMAGE}:${TAG} --no-transfer-progress"
+				  sh "./mvnw deploy -Dpackaging=docker-native -Djib.docker.image=${REPO}/${IMAGE}:${TAG} -Djib.to.auth.username=${DHUB_USR} -Djib.to.auth.password=${DHUB_PSW} --no-transfer-progress"
 				}
                             }
                         }
