@@ -1,0 +1,78 @@
+// https://github.com/GoogleContainerTools/kaniko/issues/835
+pipeline {
+    agent none
+    environment {
+        REPO        = 'caladreas'
+        IMAGE       = 'mnaut-demo'
+        VERSION     = '0.0.0'
+        GIT_SHA     = ''
+    }
+    stages {
+        stage('Image Build') {
+            parallel {
+                stage('Kaniko') {
+                    agent {
+                        kubernetes {
+                            //cloud 'kubernetes'
+                            yaml """
+kind: Pod
+spec:
+  containers:
+  - name: golang
+    image: golang:1.16
+    command:
+    - cat
+    tty: true
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: Always
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+      - name: jenkins-docker-cfg
+        mountPath: /kaniko/.docker
+    env:
+      - name: DOCKER_CONFIG
+        value: /kaniko/.docker
+  volumes:
+  - name: jenkins-docker-cfg
+    projected:
+      sources:
+      - secret:
+          name: docker-credentials
+          items:
+            - key: .dockerconfigjson
+              path: config.json
+"""
+                        }
+                    }
+                    stages {
+                        stage('get git sha') {
+                            steps {
+                                script {
+                                    GIT_SHA = sh encoding: 'UTF-8', label: 'git rev parse', returnStdout: true, script: 'git rev-parse HEAD'
+                                }
+                            }
+                        }
+                        stage('Build with Kaniko') {
+                            environment {
+                                TAG = "${GIT_SHA}"
+                            }
+                            steps {
+                                sh 'echo image fqn=${REPO}/${IMAGE}:${TAG}'
+                                container(name: 'kaniko', shell: '/busybox/sh') {
+                                    withEnv(['PATH+EXTRA=/busybox']) {
+                                        sh '''#!/busybox/sh
+                                        /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cleanup --cache=true --destination ${REPO}/${IMAGE}:${TAG} --destination ${REPO}/${IMAGE}:latest
+                                        '''
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
