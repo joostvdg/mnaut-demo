@@ -19,7 +19,7 @@ kind: Pod
 spec:
   containers:
   - name: maven
-    image: softinstigate/graalvm:21.1.0.r16-grl
+    image: vegardit/graalvm-maven:latest 
     command:
     - cat
     tty: true
