@@ -4,7 +4,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Get HEAD SHA
+        run: echo "PR_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+      - name: Verify HEAD SHA
+        run: echo "PR_SHA=${PR_SHA}"
+      - name: Test2
+        run: echo $PR_SHA
+      - name: Set env
+        run: echo "GITHUB_SHA_SHORT=$(echo $PR_SHA | cut -c 1-6)" >> $GITHUB_ENV
+      - name: Test
+        run: echo $GITHUB_SHA_SHORT        
       - uses: actions/cache@v2
         with:
           path: |
@@ -23,6 +36,18 @@ jobs:
           registry: ${{ secrets.DOCKER_REGISTRY_URL }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Extract GAV
+        id: extract
+        uses: andreacomo/maven-gav-extractor@v1
+      - name: Log GAV
+        run: |
+          echo ${{ steps.extract.outputs.group-id }}
+          echo ${{ steps.extract.outputs.artifact-id }}
+          echo ${{ steps.extract.outputs.version }}
+        shell: bash          
+      - name: Bump Version
+        run: mvn versions:set -DnewVersion=0.1."${PR_SHA}"
+        shell: bash        
       - name: Build And Push Docker Image
         env:
           DOCKER_REPOSITORY_PATH: ${{ secrets.DOCKER_REPOSITORY_PATH }}
@@ -30,4 +55,4 @@ jobs:
           TESTCONTAINERS_RYUK_DISABLED: true
         run: |
           export DOCKER_IMAGE=`echo "${DOCKER_REGISTRY_URL}/${DOCKER_REPOSITORY_PATH}/mnaut-demo" | sed -e 's#//#/#' -e 's#^/##'`
-          ./mvnw deploy -Dpackaging=docker-native -Djib.docker.image=$DOCKER_IMAGE --no-transfer-progress
+          ./mvnw deploy -Dpackaging=docker-native -Djib.docker.image=$DOCKER_IMAGE --no-transfer-progress -Drevision=${{ steps.extract.outputs.version }}.${PR_SHA} 

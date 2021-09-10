@@ -18,32 +18,11 @@ pipeline {
 kind: Pod
 spec:
   containers:
-  - name: golang
-    image: golang:1.16
+  - name: maven
+    image: vegardit/graalvm-maven:latest 
     command:
     - cat
     tty: true
-  - name: kaniko
-    image: gcr.io/kaniko-project/executor:debug
-    imagePullPolicy: Always
-    command:
-    - /busybox/cat
-    tty: true
-    volumeMounts:
-      - name: jenkins-docker-cfg
-        mountPath: /kaniko/.docker
-    env:
-      - name: DOCKER_CONFIG
-        value: /kaniko/.docker
-  volumes:
-  - name: jenkins-docker-cfg
-    projected:
-      sources:
-      - secret:
-          name: docker-credentials
-          items:
-            - key: .dockerconfigjson
-              path: config.json
 """
                         }
                     }
@@ -55,19 +34,18 @@ spec:
                                 }
                             }
                         }
-                        stage('Build with Kaniko') {
+                        stage('Build with Maven & Jib') {
                             environment {
                                 TAG = "${GIT_SHA}"
+                                TESTCONTAINERS_RYUK_DISABLED= true
+                                DHUB = credentials('dockerhub-token')
                             }
                             steps {
                                 sh 'echo image fqn=${REPO}/${IMAGE}:${TAG}'
-                                container(name: 'kaniko', shell: '/busybox/sh') {
-                                    withEnv(['PATH+EXTRA=/busybox']) {
-                                        sh '''#!/busybox/sh
-                                        /kaniko/executor -f `pwd`/Dockerfile -c `pwd` --cleanup --cache=true --destination ${REPO}/${IMAGE}:${TAG} --destination ${REPO}/${IMAGE}:latest
-                                        '''
-                                    }
-                                }
+				
+                                container('maven') {
+				  sh "mvn deploy -Dpackaging=docker-native -Djib.docker.image=${REPO}/${IMAGE}:${TAG} -Djib.to.auth.username=${DHUB_USR} -Djib.to.auth.password=${DHUB_PSW} --no-transfer-progress"
+				}
                             }
                         }
                     }
