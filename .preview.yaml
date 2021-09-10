@@ -1,0 +1,19 @@
+apiVersion: 1.0.0                            
+
+previews:
+  - name: helm
+    helm:
+      chart: ./charts/mnaut-demo/
+      valuesFiles: 
+      values: 
+        image: 
+          repository: caladreas/mnaut-demo
+          tag: 0.1.${ENV_COMMIT_SHA}
+        preview:
+          enabled: true
+        ingress:
+          enabled: true
+          hosts: 
+            - hosts: ${ENV_HOSTNAME}
+              paths: /
+        instanceName: ${ENV_UNIQUE_NAME}
