@@ -42,6 +42,9 @@ service:
 
 # custom ingress annotations on this service
 ingress:
+  enabled: false
+  k3d:
+    enabled: false
   annotations: {}
   # defaults to nginx if no other ingress class annotation specified
   classAnnotation: ""
@@ -73,6 +76,7 @@ affinity: {}
 
 datasource:
     url: 'jdbc:postgresql://mnaut-demo-postgresql:5432/mnaut-demo'
+
 
 postgresql:
   global:
