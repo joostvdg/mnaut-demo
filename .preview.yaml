@@ -12,8 +12,8 @@ previews:
         preview:
           enabled: true
         ingress:
-          enabled: true
-          hosts: 
-            - hosts: ${ENV_HOSTNAME}
-              paths: /
+          host: ${ENV_HOSTNAME}
+          tlsSecretName: ${ENV_TLS_SECRET_NAME}
         instanceName: ${ENV_UNIQUE_NAME}
+        datasource:
+          url: 'jdbc:postgresql://${ENV_UNIQUE_NAME}-postgresql:5432/mnaut-demo'
