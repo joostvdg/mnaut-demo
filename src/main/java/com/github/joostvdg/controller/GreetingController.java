@@ -15,7 +15,7 @@ public class GreetingController {
 
     @Get(uri="/", produces= MediaType.TEXT_PLAIN)
     public String index() {
-        return "Example Response 11";
+        return "Example Response 21";
     }
 
     @Get(uri = "/{id}", produces = "application/json")
